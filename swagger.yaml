@@ -1,0 +1,308 @@
+openapi: 3.0.0
+info:
+  title: Harcama Takip API
+  version: 1.0.0
+  description: Kişisel gelir/gider takip uygulaması REST API'si
+
+servers:
+  - url: http://localhost:3000/api
+    description: Geliştirme sunucusu
+
+tags:
+  - name: Harcamalar
+    description: Gelir ve gider işlemleri
+  - name: Kategoriler
+    description: Harcama kategorileri
+
+paths:
+  /harcamalar:
+    get:
+      tags: [Harcamalar]
+      summary: Tüm harcamaları listele
+      parameters:
+        - in: query
+          name: kategori_id
+          schema: { type: integer }
+          description: Kategoriye göre filtrele
+        - in: query
+          name: tur
+          schema: { type: string, enum: [gider, gelir] }
+          description: Türe göre filtrele
+        - in: query
+          name: baslangic
+          schema: { type: string, format: date }
+          description: Başlangıç tarihi (YYYY-MM-DD)
+        - in: query
+          name: bitis
+          schema: { type: string, format: date }
+          description: Bitiş tarihi (YYYY-MM-DD)
+        - in: query
+          name: arama
+          schema: { type: string }
+          description: Başlık veya açıklamada ara
+      responses:
+        '200':
+          description: Harcama listesi
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Harcama' }
+    post:
+      tags: [Harcamalar]
+      summary: Yeni harcama ekle
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/HarcamaGirdi' }
+      responses:
+        '201':
+          description: Oluşturuldu
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Harcama' }
+        '400':
+          description: Geçersiz veri
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Hata' }
+
+  /harcamalar/ozet:
+    get:
+      tags: [Harcamalar]
+      summary: Finansal özet (bakiye, toplam gelir/gider)
+      responses:
+        '200':
+          description: Özet bilgisi
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Ozet' }
+
+  /harcamalar/{id}:
+    get:
+      tags: [Harcamalar]
+      summary: Tek harcama getir
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Harcama
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Harcama' }
+        '404':
+          description: Bulunamadı
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Hata' }
+    put:
+      tags: [Harcamalar]
+      summary: Harcamayı güncelle
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/HarcamaGirdi' }
+      responses:
+        '200':
+          description: Güncellendi
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Harcama' }
+        '400':
+          description: Geçersiz veri
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Hata' }
+        '404':
+          description: Bulunamadı
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Hata' }
+    delete:
+      tags: [Harcamalar]
+      summary: Harcamayı sil
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '204':
+          description: Silindi
+        '404':
+          description: Bulunamadı
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Hata' }
+
+  /kategoriler:
+    get:
+      tags: [Kategoriler]
+      summary: Tüm kategorileri listele
+      responses:
+        '200':
+          description: Kategori listesi
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Kategori' }
+    post:
+      tags: [Kategoriler]
+      summary: Yeni kategori oluştur
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/KategoriGirdi' }
+      responses:
+        '201':
+          description: Oluşturuldu
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Kategori' }
+        '400':
+          description: Geçersiz veri
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Hata' }
+
+  /kategoriler/{id}:
+    get:
+      tags: [Kategoriler]
+      summary: Tek kategori getir
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Kategori
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Kategori' }
+        '404':
+          description: Bulunamadı
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Hata' }
+    put:
+      tags: [Kategoriler]
+      summary: Kategoriyi güncelle
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/KategoriGirdi' }
+      responses:
+        '200':
+          description: Güncellendi
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Kategori' }
+        '400':
+          description: Geçersiz veri
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Hata' }
+        '404':
+          description: Bulunamadı
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Hata' }
+    delete:
+      tags: [Kategoriler]
+      summary: Kategoriyi sil
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '204':
+          description: Silindi
+        '404':
+          description: Bulunamadı
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Hata' }
+
+components:
+  schemas:
+    Harcama:
+      type: object
+      properties:
+        id: { type: integer }
+        baslik: { type: string }
+        miktar: { type: number }
+        tur: { type: string, enum: [gider, gelir] }
+        kategori_id: { type: integer, nullable: true }
+        kategori_ad: { type: string, nullable: true }
+        kategori_renk: { type: string, nullable: true }
+        aciklama: { type: string, nullable: true }
+        tarih: { type: string, format: date }
+        olusturulma: { type: string }
+
+    HarcamaGirdi:
+      type: object
+      required: [baslik, miktar, tur]
+      properties:
+        baslik: { type: string, example: 'Market alışverişi' }
+        miktar: { type: number, example: 250.50 }
+        tur: { type: string, enum: [gider, gelir], example: 'gider' }
+        kategori_id: { type: integer, nullable: true, example: 1 }
+        aciklama: { type: string, nullable: true, example: 'Haftalık market' }
+        tarih: { type: string, format: date, example: '2026-05-20' }
+
+    Ozet:
+      type: object
+      properties:
+        toplam_gelir: { type: number }
+        toplam_gider: { type: number }
+        bakiye: { type: number }
+        kategori_bazli:
+          type: array
+          items:
+            type: object
+            properties:
+              ad: { type: string }
+              renk: { type: string }
+              toplam: { type: number }
+              adet: { type: integer }
+
+    Kategori:
+      type: object
+      properties:
+        id: { type: integer }
+        ad: { type: string }
+        renk: { type: string }
+        harcama_sayisi: { type: integer }
+        olusturulma: { type: string }
+
+    KategoriGirdi:
+      type: object
+      required: [ad]
+      properties:
+        ad: { type: string, example: 'Spor' }
+        renk: { type: string, example: '#f97316' }
+
+    Hata:
+      type: object
+      properties:
+        hata: { type: string }

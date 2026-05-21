@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Harcama Takip</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="logo">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <rect width="28" height="28" rx="8" fill="#22c55e"/>
+        <path d="M8 14h12M14 8v12" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M8 14c0 3.314 2.686 6 6 6s6-2.686 6-6" stroke="white" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+      </svg>
+      <span>Param</span>
+    </div>
+    <nav>
+      <button class="nav-btn active" data-page="ozet">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Özet
+      </button>
+      <button class="nav-btn" data-page="harcamalar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
+        Harcamalar
+      </button>
+      <button class="nav-btn" data-page="kategoriler">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7l9-4 9 4v10l-9 4-9-4V7z"/><path d="M12 3v18M3 7l9 4 9-4"/></svg>
+        Kategoriler
+      </button>
+    </nav>
+    <a class="swagger-link" href="/api-docs" target="_blank">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      API Docs
+    </a>
+  </aside>
+
+  <main class="main">
+    <!-- ÖZET SAYFASI -->
+    <section id="page-ozet" class="page active">
+      <header class="page-header">
+        <h1>Genel Bakış</h1>
+        <button class="btn btn-primary" id="hizli-ekle-btn">+ Harcama Ekle</button>
+      </header>
+      <div class="cards-row" id="ozet-cards">
+        <div class="stat-card gelir">
+          <span class="stat-label">Toplam Gelir</span>
+          <span class="stat-value" id="stat-gelir">—</span>
+        </div>
+        <div class="stat-card gider">
+          <span class="stat-label">Toplam Gider</span>
+          <span class="stat-value" id="stat-gider">—</span>
+        </div>
+        <div class="stat-card bakiye">
+          <span class="stat-label">Net Bakiye</span>
+          <span class="stat-value" id="stat-bakiye">—</span>
+        </div>
+      </div>
+      <div class="ozet-bottom">
+        <div class="panel">
+          <h2>Kategoriye Göre Giderler</h2>
+          <div id="kategori-chart"></div>
+        </div>
+        <div class="panel">
+          <h2>Son İşlemler</h2>
+          <div id="son-islemler"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HARCAMALAR SAYFASI -->
+    <section id="page-harcamalar" class="page">
+      <header class="page-header">
+        <h1>Harcamalar</h1>
+        <button class="btn btn-primary" id="yeni-harcama-btn">+ Yeni Ekle</button>
+      </header>
+      <div class="filter-bar">
+        <input type="text" id="arama" placeholder="Ara…" class="input-search" />
+        <select id="filtre-tur" class="select">
+          <option value="">Tümü</option>
+          <option value="gider">Gider</option>
+          <option value="gelir">Gelir</option>
+        </select>
+        <select id="filtre-kategori" class="select">
+          <option value="">Tüm Kategoriler</option>
+        </select>
+        <input type="date" id="filtre-baslangic" class="input-date" />
+        <input type="date" id="filtre-bitis" class="input-date" />
+        <button class="btn btn-ghost" id="filtre-temizle">Temizle</button>
+      </div>
+      <div id="harcama-listesi" class="table-wrap"></div>
+    </section>
+
+    <!-- KATEGORİLER SAYFASI -->
+    <section id="page-kategoriler" class="page">
+      <header class="page-header">
+        <h1>Kategoriler</h1>
+        <button class="btn btn-primary" id="yeni-kategori-btn">+ Yeni Kategori</button>
+      </header>
+      <div id="kategori-listesi" class="kategori-grid"></div>
+    </section>
+  </main>
+
+  <!-- MODAL -->
+  <div id="modal-overlay" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modal-baslik">İşlem</h3>
+        <button class="modal-kapat" id="modal-kapat">✕</button>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/ui.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>
